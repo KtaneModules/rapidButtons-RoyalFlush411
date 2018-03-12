@@ -1,9 +1,8 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using rapidButtons;
+using UnityEngine;
 
 public class rapidButtonsScript : MonoBehaviour
 {
@@ -12,6 +11,7 @@ public class rapidButtonsScript : MonoBehaviour
     public List<Button> buttons = new List<Button>();
     public List<String> buttonText = new List<string>();
     public List<Color> buttonColors = new List<Color>();
+    public List<string> buttonColorNames = new List<string>();
     private Button[] selectedButtons;
     private Button[] correctButtons;
     public KMAudio Audio;
@@ -26,12 +26,12 @@ public class rapidButtonsScript : MonoBehaviour
         moduleId = moduleIdCounter++;
         needyModule = GetComponent<KMNeedyModule>();
         needyModule.OnNeedyActivation += OnNeedyActivation;
-        needyModule.OnNeedyDeactivation+= OnNeedyDeactivation;
-        needyModule.OnTimerExpired+= OnTimerExpired;
+        needyModule.OnNeedyDeactivation += OnNeedyDeactivation;
+        needyModule.OnTimerExpired += OnTimerExpired;
         foreach (Button button in buttons)
         {
             Button trueButton = button;
-            trueButton.selectable.OnInteract += delegate () { buttonPress (trueButton); return false; };
+            trueButton.selectable.OnInteract += delegate () { buttonPress(trueButton); return false; };
         }
     }
 
@@ -141,14 +141,17 @@ public class rapidButtonsScript : MonoBehaviour
 
     void OnNeedyActivation()
     {
-        selectedButtons = buttons.RandomPick(3,true).ToArray();
+        selectedButtons = buttons.RandomPick(3, true).ToArray();
+        var colorNames = new List<string>();
         foreach (Button button in selectedButtons)
         {
             button.gameObject.SetActive(true);
-            button.buttonRend.material.color = buttonColors.RandomPick();
+            var pick = UnityEngine.Random.Range(0, buttonColors.Count);
+            button.buttonRend.material.color = buttonColors[pick];
+            colorNames.Add(buttonColorNames[pick]);
             button.text.text = buttonText.RandomPick();
         }
-        Debug.LogFormat("[Rapid Buttons #{0}] Your three buttons are {1} with '{2} label', {3} with '{4} label' and {5} with '{6} label'.", moduleId, selectedButtons[0].buttonRend.material.color, selectedButtons[0].text.text.Replace(" ", "no"), selectedButtons[1].buttonRend.material.color, selectedButtons[1].text.text.Replace(" ", "no"), selectedButtons[2].buttonRend.material.color, selectedButtons[2].text.text.Replace(" ", "no"));
+        Debug.LogFormat("[Rapid Buttons #{0}] Your three buttons are {1} with '{2} label', {3} with '{4} label' and {5} with '{6} label'.", moduleId, colorNames[0], selectedButtons[0].text.text.Replace(" ", "no"), colorNames[1], selectedButtons[1].text.text.Replace(" ", "no"), colorNames[2], selectedButtons[2].text.text.Replace(" ", "no"));
         buttonLogic();
     }
 
@@ -175,7 +178,7 @@ public class rapidButtonsScript : MonoBehaviour
         }
         else
         {
-            Debug.LogFormat("[Rapid Buttons #{0}] Strike! You pushed the {1} button with '{2}-label'. That was incorrect.", moduleId, pressedButton.buttonRend.material.color, pressedButton.text.text.Replace(" ", "no"));
+            Debug.LogFormat("[Rapid Buttons #{0}] Strike! You pushed the {1} button with '{2}-label'. That was incorrect.", moduleId, buttonColorNames[buttonColors.IndexOf(pressedButton.buttonRend.material.color)], pressedButton.text.text.Replace(" ", "no"));
             GetComponent<KMNeedyModule>().HandleStrike();
             OnNeedyDeactivation();
         }
