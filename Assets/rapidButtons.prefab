@@ -5251,6 +5251,17 @@ MonoBehaviour:
   - {r: 1, g: 1, b: 1, a: 0}
   - {r: 0.46323532, g: 0.46323532, b: 0.46323532, a: 0}
   - {r: 0.31617647, g: 0.21587223, b: 0, a: 0}
+  buttonColorNames:
+  - Aqua
+  - Red
+  - Green
+  - Purple
+  - Yellow
+  - Orange
+  - Pink
+  - White
+  - Gray
+  - Brown
   Audio: {fileID: 114449325371559692}
 --- !u!114 &114937374579831706
 MonoBehaviour:
